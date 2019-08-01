@@ -9,5 +9,3 @@ async def login(req, resp):
 
 if __name__ == '__main__':
     api.run()
-
-# practice
