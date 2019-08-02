@@ -5,7 +5,9 @@ Vue.use(Router)
 
 const routerOptions = [
   { path: '/', component: 'Home' },
+  { path: '/user', component: 'Home' },
   { path: '/about', component: 'About' },
+  { path: '/tryaccess/:accessType/:url', component: 'TryAccess' },
   { path: '*', component: 'HelloWorld' },
 ]
 

@@ -1,18 +1,40 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="@/assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <p>Home page</p>
+    <p>Random number from backend: {{ randomNumber }}</p>
+    <button @click="getRandom">New random number</button>
+    <router-link to="/about"><a>about</a></router-link>
+    <router-link to="/tryaccess/login/user"><a>login</a></router-link>
+    <router-link to="/tryaccess/signup/user"><a>signup</a></router-link>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
+import axios from 'axios'
+import { mapState } from 'vuex';
 export default {
-  name: 'home',
-  components: {
-    HelloWorld
+  data () {
+    return {
+      randomNumber: 0
+    }
+  },
+  computed: mapState([
+    'base_url'
+  ]),
+  methods: {
+    getRandom () {
+      const path = this.base_url + '/api/random';
+      axios.get(path)
+        .then(response => {
+          this.randomNumber = response.data.randomNumber;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+  },
+  created () {
+    this.getRandom();
   }
 }
 </script>
