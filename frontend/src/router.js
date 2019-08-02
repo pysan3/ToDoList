@@ -6,7 +6,7 @@ Vue.use(Router)
 const routerOptions = [
   { path: '/', component: 'Home' },
   { path: '/about', component: 'About' },
-  { path: '/helloworld', component: 'HelloWorld' },
+  { path: '*', component: 'HelloWorld' },
 ]
 
 const routes = routerOptions.map(route => {

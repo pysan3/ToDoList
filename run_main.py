@@ -1,6 +1,6 @@
 import responder
 
-api = responder.API()
+api = responder.API(static_dir='./static', templates_dir='./static')
 api.add_route('/', static=True, websocket=True)
 
 @api.route('/api/login')
