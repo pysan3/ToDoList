@@ -14,9 +14,9 @@
 </template>
 
 <script>
-import axios from 'axios'
-import * as types from '@/mutation-types'
-import { mapState } from 'vuex'
+import axios from 'axios';
+import { mapState } from 'vuex';
+import * as types from '@/mutation-types';
 export default {
   data () {
     return {
@@ -26,7 +26,7 @@ export default {
       user_name: '',
       user_password: '',
       msg: ['make a new account', 'already have an account']
-    }
+    };
   },
   computed: mapState([
     'user_id',
@@ -34,30 +34,30 @@ export default {
   ]),
   watch: {
     '$route' (to, _) { // eslint-disable-line no-unused-vars
-      this.accessID = (to.params.accessType === 'login') + 0
+      this.accessID = (to.params.accessType === 'login') + 0;
     }
   },
   methods: {
     tryAccess () {
       if (this.user_name.length * this.user_password.length === 0) {
-        alert('should not be zero charactors')
-        return
+        alert('should not be zero charactors');
+        return;
       }
       axios.post(this.base_url + '/api/' + this.accessTypes[this.accessID], {
         user_name: this.user_name,
         user_password: this.user_password
       })
         .then(response => {
-          const responseID = response.data.user_id - 0
+          const responseID = response.data.user_id - 0;
           if (responseID !== -1 && response.data.isFound-0 === 1) {
-            this.$store.commit(types.USER_ID, responseID)
-            this.$router.push(this.url)
+            this.$store.commit(types.USER_ID, responseID);
+            this.$router.push(this.url);
           } else {
-            alert(response.data.msg)
+            alert(response.data.msg);
           }
         })
         .catch(error => {
-          console.log(error)
+          console.log(error);
         })
     },
     accessOpposite () {
@@ -66,16 +66,16 @@ export default {
         params: {
           accessType: this.accessTypes[-1 * (this.accessID - 1)]
         }
-      })
+      });
     }
   },
   created () {
     if (this.accessID === 0 && this.$route.params.accessType !== 'signup') {
-      alert('url broken')
-      this.$router.push('/')
+      alert('url broken');
+      this.$router.push('/');
     }
   }
-}
+};
 </script>
 
 <style lang="stylus" scoped>

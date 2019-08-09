@@ -24,7 +24,7 @@ const actions = {
         window.location.href = '/tryaccess/login/' + url;
       }
     }
-    request.open('GET', state.base_url + '/api/login/' + context.state.user_id, true);
+    request.open('GET', state.base_url + '/api/loggedin/' + context.state.user_id, true);
     request.send();
   }
 }

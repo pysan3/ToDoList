@@ -39,14 +39,10 @@ def signup(data):
     session.close()
     return {'isFound': user_id>=0 + 0, 'user_id': user_id, 'msg': msg}
 
-def logged_in(user_id):
-    if user_id < 2:
+def check_login(user_id):
+    if user_id < 0:
         return 0
-    session = Session()
-    result = session.query(Eventlogs).filter_by(user_id=user_id).all()
-    event_id_logout = session.query(Eventnames).filter_by(event_name='logout').one().id - 1
-    session.close()
-    if len(result) == 0 or result[-1].event_id == event_id_logout:
-        return 0
-    else:
+    elif user_id <= 2:
         return 1
+    else:
+        return 0
