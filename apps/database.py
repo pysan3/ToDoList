@@ -23,3 +23,13 @@ class Users(Base):
 	def __repr__(self):
 		return '<Users(id=%s, user_name=%s, user_password=%s, created_at=%s, )>' \
 			% (self.id, self.user_name, self.user_password, self.created_at)
+
+class TokenTable(Base):
+	__tablename__ = 'tokentable'
+	id = Column('id', Integer, primary_key=True)
+	token = Column('token', String)
+	user_id = Column('user_id', Integer)
+
+	def ___repr__(self):
+		return '<TokenTable(id=%s, token=%s, user_id=%s, )>' \
+			% (self.id, self.token, self.user_id)

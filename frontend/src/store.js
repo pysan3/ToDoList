@@ -1,36 +1,37 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import * as types from './mutation-types'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import Axios from 'axios';
+import * as types from './mutation-types';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 const state = {
-  user_id: -1,
+  token: 'none',
   base_url: 'http://127.0.0.1:5042'
-}
+};
 
 const mutations = {
-  [types.USER_ID] (state, num) {
-    state.user_id = num - 0;
+  [types.USER_TOKEN] (state, token) {
+    state.token = token;
   }
-}
+};
 
 const actions = {
   logged_in (context, url) {
-    const request = new XMLHttpRequest();
-    request.responseType = 'text';
-    request.onload = () => {
-      if (request.responseText === '0') {
+    Axios.post(state.base_url + '/api/loggedin', {
+      token: context.state.token
+    }).then(resp => {
+      if (resp.data !== 'valid') {
         window.location.href = '/tryaccess/login/' + url;
       }
-    }
-    request.open('GET', state.base_url + '/api/loggedin/' + context.state.user_id, true);
-    request.send();
+    }).catch(error => {
+      console.log(error);
+    })
   }
-}
+};
 
 export default new Vuex.Store({
   state,
   mutations,
   actions
-})
+});

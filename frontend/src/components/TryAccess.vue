@@ -50,7 +50,7 @@ export default {
         .then(response => {
           const responseID = response.data.user_id - 0;
           if (responseID !== -1 && response.data.isFound-0 === 1) {
-            this.$store.commit(types.USER_ID, responseID);
+            this.$store.commit(types.USER_TOKEN, response.data.token);
             this.$router.push(this.url);
           } else {
             alert(response.data.msg);

@@ -16,9 +16,20 @@ async def login(req, resp):
 async def signup(req, resp):
     resp.media = backapp.signup(await req.media())
 
-@api.route('/api/loggedin/{user_id}')
-async def logged_in(req, resp, *, user_id):
-    resp.text = f"{backapp.check_login(int(user_id))}"
+@api.route('/api/loggedin')
+async def logged_in(req, resp):
+    resp.text = 'valid' if backapp.check_login((await req.media())['token']) else 'invalid'
+
+@api.route('/api/loadfile')
+async def load_file(req, resp):
+    user_id = backapp.verify_user((await req.media())['token'])
+    if user_id:
+        resp.media = dict({
+            'valid': '1',
+            'user_name': backapp.username(user_id)
+        }, **backapp.load_file(user_id))
+    else:
+        resp.media = {'valid': '0'}
 
 @api.route('/api/random')
 def random_number(req, resp):
