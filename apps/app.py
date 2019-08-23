@@ -78,7 +78,7 @@ def load_file(user_id):
         files = []
         for f in os.listdir(path):
             f_path = f'{path}/{f}'
-            f_data = {'id': len(files), 'name': f, 'type': 'file', 'show': '1', 'insides': []}
+            f_data = {'id': f_path, 'name': f, 'type': 'file', 'show': '1', 'insides': []}
             if os.path.isdir(f_path):
                 f_data['type'] = 'dir'
                 f_data['insides'].extend(file_recursive(f_path))

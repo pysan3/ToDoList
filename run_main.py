@@ -1,7 +1,6 @@
 import responder
-import sqlite3
-
 import random
+import urllib
 
 import apps.app as backapp
 
@@ -26,10 +25,28 @@ async def load_file(req, resp):
     if user_id:
         resp.media = dict({
             'valid': '1',
+            'user_id': str(user_id),
             'user_name': backapp.username(user_id)
         }, **backapp.load_file(user_id))
     else:
         resp.media = {'valid': '0'}
+
+@api.route('/api/userfile/{file_url}')
+async def user_file(req, resp, *, file_url):
+    user_id = backapp.verify_user((await req.media())['token'])
+    if user_id:
+        with open(urllib.parse.unquote(file_url), 'r') as f:
+            resp.text = f.read()
+    else:
+        resp.text = ''
+
+@api.route('/api/fileupload/{file_url}')
+async def fileupload(req, resp, *, file_url):
+    data = await req.media()
+    user_id = backapp.verify_user(data['token'])
+    if user_id:
+        with open(urllib.parse.unquote(file_url), 'w') as f:
+            f.write(data['data'])
 
 @api.route('/api/random')
 def random_number(req, resp):

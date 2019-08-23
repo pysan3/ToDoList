@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import ThisFile from '@/components/ThisFile'
+import ThisFile from '@/components/ThisFile';
+import * as types from '@/mutation-types';
 
 export default {
   name: 'this-file',
@@ -25,8 +26,12 @@ export default {
   },
   methods: {
     hidden () {
-      this.comment.show = (this.comment.show === '1' ? '0' : '1');
+      if (this.comment.type === 'dir') {
+        this.comment.show = (this.comment.show === '1' ? '0' : '1');
+      } else if (this.comment.type === 'file') {
+        this.$store.commit(types.CURRENT_FILEID, this.comment.id);
+      }
     }
   }
-}
+};
 </script>
