@@ -29,7 +29,6 @@ export default {
     };
   },
   computed: mapState([
-    'user_id',
     'base_url'
   ]),
   watch: {

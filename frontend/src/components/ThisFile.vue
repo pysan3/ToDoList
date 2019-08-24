@@ -1,5 +1,5 @@
 <template>
-  <div class="this-file">
+  <div class="current-file">
     <div @click="hidden">
       <img id="file-type" v-if="comment.type==='dir'" :src="images.folder" alt="folder" height="16px" width="16px">
       <img id="file-type" v-if="comment.type==='file'" :src="images.file" alt="file" height="16px" width="16px">
@@ -49,21 +49,17 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.this-file {
-  margin: 0px;
-  border: 0px;
-  padding: 0px;
-}
+.current-file
+  margin 0px
+  border 0px
+  padding 0px
+  ul
+    list-style none
+    padding-left 16px
 
-.this-file li {
-  list-style: none;
-}
+p#content-name
+  font-size medium
 
-p#content-name {
-  font-size: medium;
-}
-
-img#file-type {
-  float: left;
-}
+img#file-type
+  float left
 </style>

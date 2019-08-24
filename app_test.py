@@ -1,4 +1,9 @@
 import apps.app as backapp
 
-print(backapp.load_file(1))
-print(dict({'valid': '1'}, **backapp.load_file(1)))
+backapp.run_command(1, 'echo hoge > test.txt'.split())
+backapp.run_command(1, 'echo hoge'.split())
+
+res = backapp.run_command(1, 'echo hoge > old/hoge/text.txt'.split()).stdout
+if res is None:
+    res = ''.encode('utf-8')
+print(res.decode('utf-8'))

@@ -8,7 +8,8 @@ const routerOptions = [
   { path: '/user', component: 'User' },
   { path: '/about', component: 'About' },
   { path: '/tryaccess/:accessType/:url', component: 'TryAccess' },
-  { path: '/directory', component: 'Directory' },
+  { path: '/projects', component: 'Projects' },
+  { path: '/directory/:project', component: 'Directory' },
   { path: '*', component: 'HelloWorld' },
 ]
 

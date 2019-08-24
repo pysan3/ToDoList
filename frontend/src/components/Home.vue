@@ -8,8 +8,6 @@
     <router-link to="/tryaccess/login/user"><a>login</a></router-link>
     <br>
     <router-link to="/tryaccess/signup/user"><a>signup</a></router-link>
-    <br>
-    <router-link to="/directory"><a>your directory</a></router-link>
   </div>
 </template>
 

@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import subprocess
 import hashlib
 import secrets
 from datetime import datetime
@@ -70,8 +71,8 @@ def verify_user(token):
     else:
         return int(user_id.user_id)
 
-def load_file(user_id):
-    path = f'user_files/{user_id}'
+def load_file(user_id, project):
+    path = f'user_files/{user_id}/{project}'
     if not os.path.exists(path):
         os.mkdir(path)
     def file_recursive(path):
@@ -86,8 +87,41 @@ def load_file(user_id):
         return files
     return {'comment': file_recursive(path)}
 
+def load_project(user_id):
+    path = f'user_files/{user_id}'
+    if not os.path.exists(path):
+        os.mkdir(path)
+    dirs = []
+    for d in os.listdir(path):
+        d_path = f'{path}/{d}'
+        if os.path.isdir(d_path):
+            dirs.append({'name': d})
+    return {'projects': dirs}
+
 def username(user_id):
     session = Session()
     name = session.query(Users).filter_by(id=user_id).first()
     session.close()
     return name.user_name
+
+def run_command(user_id, project, command):
+    in_file = subprocess.PIPE
+    out_file = subprocess.PIPE
+    project_path = f'user_files/{user_id}/{project}/'
+    command_length = len(command)
+    for i, c in enumerate(reversed(command), 1):
+        index = command_length - i
+        if c == '>':
+            out_file = open(project_path + command[index + 1], 'w')
+            command = command[:index]
+        elif c == '>>':
+            out_file = open(project_path + command[index + 1], 'a')
+            command = command[:index]
+        elif c == '<':
+            in_file = open(project_path + command[index + 1], 'r')
+            command = command[:index]
+        elif c == '|':
+            in_file = run_command(user_id, command[:index])
+            command = command[index + 1:]
+            break
+    return subprocess.run(command, cwd=project_path, stdin=in_file, stdout=out_file, stderr=out_file).stdout
