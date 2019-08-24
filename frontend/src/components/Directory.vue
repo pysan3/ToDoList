@@ -1,24 +1,34 @@
 <template>
   <div class="directory">
+    <div class="header">
+      <div class="header-logo">auto make</div>
+      <div class="header-list">
+        <ul>
+          <li>プログラミングとは</li>
+          <li>学べるレッスン</li>
+          <li>お問い合わせ</li>
+        </ul>
+      </div>
+    </div>
     <div class="inventory">
-      <p>{{ user_name }}</p>
-      <ul>
-        <li v-for="(item, index) in comment" :key="index">
-          <this-file :comment="item"/>
-        </li>
-      </ul>
+      <h2>{{ user_name }}</h2>
+      <div v-for="(item, index) in comment" :key="index">
+        <this-file :comment="item"/>
+      </div>
     </div>
     <div class="working-space">
-      <button @click="autoSave=!autoSave">Auto Save</button>
-      <p>{{ autoSave }}</p>
-      <textarea v-model="file_data[working_text[0]]" @change="working_text[1]+=1" name="file-data" id="file-data" cols="30" rows="10"></textarea>
+      <div id="auto-save">
+        <button @click="autoSave=!autoSave">Auto Save</button>
+        <p>{{ autoSave }}</p>
+      </div>
+      <textarea v-model="file_data[working_text[0]]" @change="working_text[1]+=1" name="file-data" id="file-data"></textarea>
     </div>
     <div class="terminal">
       <div><input type="text" v-model="command[command.length-1]"></div>
       <button id="btn">send</button>
+      <h2>results</h2>
+      <textarea readonly v-model="result_data" name="result-data" id="result-data"></textarea>
     </div>
-    <h2>results</h2>
-    <p style="white-space:pre-wrap; word-wrap:break-word;">{{ result_data }}</p>
   </div>
 </template>
 
@@ -99,7 +109,7 @@ export default {
         const data = JSON.parse(event.data);
         vm.result_data += data.result;
       };
-      vm.connection.onclose = event => {
+      vm.connection.onclose = event => { // eslint-disable-line no-unused-vars
         vm.connection.close();
         vm.connection = null;
         alert('ERROR: please reload this page');
@@ -132,6 +142,10 @@ export default {
     this.$store.dispatch('logged_in', 'user');
     this.load_files();
   },
+  updated () {
+    const result = document.getElementById('result-data');
+    result.scrollTop = result.scrollHeight;
+  },
   beforeDestroy () {
     if (this.connection !== null) {
       this.connection.close();
@@ -139,3 +153,78 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+.directory, .inventory, .working-space, .terminal {
+  margin: 0px;
+  border: 0px;
+  padding: 0px;
+}
+
+.directory {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  overflow: hidden;
+  color: black;
+}
+
+li {
+  list-style: none;
+}
+
+.header {
+  background-color: #26d0c9;
+  color: #fff;
+  height: 90px;
+}
+
+.header-logo {
+  float: left;
+  font-size: 36px;
+}
+
+.header-list li {
+  float: left;
+}
+
+.inventory {
+  width: 200px;
+  min-height: 100%;
+  float: left;
+  background-color: bisque;
+}
+
+.inventory li {
+  font-size: medium;
+}
+
+.working-space {
+  width: calc(100% - 200px);
+  float: right;
+  background-color: #fff;
+}
+
+.working-space div#auto-save {
+  float: right;
+}
+
+.terminal {
+  width: calc(100% - 200px);
+  min-height: 100%;
+  float: right;
+  background-color: azure;
+}
+
+textarea {
+  width: 85%;
+}
+
+#file-data {
+  height: 50vh;
+}
+
+#result-data {
+  height: 15vh;
+}
+</style>

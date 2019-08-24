@@ -24,11 +24,7 @@ async def logged_in(req, resp):
 async def load_file(req, resp):
     user_id = backapp.verify_user((await req.media())['token'])
     if user_id:
-        resp.media = dict({
-            'valid': '1',
-            'user_id': str(user_id),
-            'user_name': backapp.username(user_id)
-        }, **backapp.load_file(user_id))
+        resp.media = dict({'valid': '1', 'user_id': str(user_id), 'user_name': backapp.username(user_id)}, **backapp.load_file(user_id))
     else:
         resp.media = {'valid': '0'}
 
@@ -59,15 +55,8 @@ async def ws_terminal(ws):
             if user_id != backapp.verify_user(data['token']):
                 break
             if len(data['command'].split()) > 0:
-                res = subprocess.run(
-                    data['command'].split(),
-                    cwd=f'user_files/{user_id}',
-                    stdout = subprocess.PIPE,
-                    stderr = subprocess.PIPE
-                )
-                await ws.send_json({
-                    'result': res.stdout.decode('utf-8')
-                })
+                res = subprocess.run(data['command'].split(), cwd=f'user_files/{user_id}', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                await ws.send_json({'result': res.stdout.decode('utf-8')})
     except:
         pass
     await ws.close()
