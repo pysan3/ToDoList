@@ -11,8 +11,14 @@
     <div class="working-space">
       <button @click="autoSave=!autoSave">Auto Save</button>
       <p>{{ autoSave }}</p>
-      <textarea v-model="file_data[working_text[0]]" @change="working_text[1]+=1" name="file-data" id="file-data" cols="100" rows="100"></textarea>
+      <textarea v-model="file_data[working_text[0]]" @change="working_text[1]+=1" name="file-data" id="file-data" cols="30" rows="10"></textarea>
     </div>
+    <div class="terminal">
+      <div><input type="text" v-model="command[command.length-1]"></div>
+      <button id="btn">send</button>
+    </div>
+    <h2>results</h2>
+    <p style="white-space:pre-wrap; word-wrap:break-word;">{{ result_data }}</p>
   </div>
 </template>
 
@@ -32,12 +38,16 @@ export default {
       'user_id': '',
       'working_text': ['', 0],
       'autoSave': true,
-      'file_data': {'': ''}
+      'file_data': {'': ''},
+      'command': [''],
+      'result_data': '',
+      'connection': null
     };
   },
   computed: mapState([
     'token',
-    'base_url'
+    'base_url',
+    'ws_url'
   ]),
   methods: {
     load_files () {
@@ -71,11 +81,42 @@ export default {
         })
       }
     },
-    saveFile(file_name) {
+    saveFile (file_name) {
       Axios.post(this.base_url + '/api/fileupload/' + file_name, {
         token: this.token,
         data: this.file_data[file_name]
       })
+    },
+    ws_connection () {
+      const vm = this;
+      vm.connection = new WebSocket(this.ws_url + '/ws/terminal');
+      vm.connection.onopen = event => { // eslint-disable-line no-unused-vars
+        vm.connection.send(JSON.stringify({
+          token: vm.token
+        }));
+      };
+      vm.connection.onmessage = event => {
+        const data = JSON.parse(event.data);
+        vm.result_data += data.result;
+      };
+      vm.connection.onclose = event => {
+        vm.connection.close();
+        vm.connection = null;
+        alert('ERROR: please reload this page');
+      }
+      const btn = document.getElementById('btn');
+      btn.onclick = () => {
+        let new_command = '!!', i = 1;
+        while (new_command === '!!') {
+          new_command = vm.command[vm.command.length-(i++)];
+        }
+        vm.connection.send(JSON.stringify({
+          token: vm.token,
+          command: new_command
+        }));
+        vm.result_data += `> ${new_command}\n`;
+        vm.command.push('');
+      };
     }
   },
   mounted () {
@@ -85,10 +126,16 @@ export default {
         this.change_Workingspace(from, to);
       }
     )
+    this.ws_connection();
   },
   created () {
     this.$store.dispatch('logged_in', 'user');
     this.load_files();
+  },
+  beforeDestroy () {
+    if (this.connection !== null) {
+      this.connection.close();
+    }
   }
 }
 </script>

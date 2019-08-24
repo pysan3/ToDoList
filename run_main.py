@@ -1,5 +1,6 @@
 import responder
 import random
+import subprocess
 import urllib
 
 import apps.app as backapp
@@ -47,6 +48,29 @@ async def fileupload(req, resp, *, file_url):
     if user_id:
         with open(urllib.parse.unquote(file_url), 'w') as f:
             f.write(data['data'])
+
+@api.route('/ws/terminal', websocket=True)
+async def ws_terminal(ws):
+    await ws.accept()
+    user_id = backapp.verify_user((await ws.receive_json())['token'])
+    try:
+        while user_id is not False:
+            data = await ws.receive_json()
+            if user_id != backapp.verify_user(data['token']):
+                break
+            if len(data['command'].split()) > 0:
+                res = subprocess.run(
+                    data['command'].split(),
+                    cwd=f'user_files/{user_id}',
+                    stdout = subprocess.PIPE,
+                    stderr = subprocess.PIPE
+                )
+                await ws.send_json({
+                    'result': res.stdout.decode('utf-8')
+                })
+    except:
+        pass
+    await ws.close()
 
 @api.route('/api/random')
 def random_number(req, resp):
