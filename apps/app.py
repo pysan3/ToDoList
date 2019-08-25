@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from glob import glob
 import subprocess
 import hashlib
 import secrets
@@ -7,6 +8,12 @@ from datetime import datetime
 
 from apps.database import Session, Users, TokenTable
 from sqlalchemy.sql import exists
+
+def init_server():
+    subprocess.run('python database_init.py'.split())
+    for d in os.listdir('user_files'):
+        if os.path.isdir(f'user_files/{d}') and d != '1':
+            os.system(f'rm -rf user_files/{d}')
 
 def login(data):
     session = Session()
@@ -104,7 +111,7 @@ def username(user_id):
     session.close()
     return name.user_name
 
-def run_command(user_id, project, command):
+def run_command(user_id, project, command, cat):
     in_file = subprocess.PIPE
     out_file = subprocess.PIPE
     project_path = f'user_files/{user_id}/{project}/'
@@ -121,7 +128,8 @@ def run_command(user_id, project, command):
             in_file = open(project_path + command[index + 1], 'r')
             command = command[:index]
         elif c == '|':
-            in_file = run_command(user_id, command[:index])
+            in_file = run_command(user_id, project, command[:index], True).stdout
             command = command[index + 1:]
             break
-    return subprocess.run(command, cwd=project_path, stdin=in_file, stdout=out_file, stderr=out_file).stdout
+    return subprocess.run(command, cwd=project_path, stdin=in_file, stdout=out_file, stderr=out_file)
+

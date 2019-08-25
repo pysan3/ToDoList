@@ -1,5 +1,7 @@
 import responder
 import random
+import os
+import sys
 import subprocess
 import urllib
 
@@ -7,6 +9,7 @@ import apps.app as backapp
 
 api = responder.API(static_dir='./static', templates_dir='./static')
 api.add_route('/', static=True, websocket=True)
+backapp.init_server()
 
 @api.route('/api/login')
 async def login(req, resp):
@@ -57,12 +60,12 @@ async def ws_terminal(ws):
             if user_id != backapp.verify_user(data['token']):
                 break
             if len(data['command'].split()) > 0:
-                res = backapp.run_command(user_id, project, data['command'].split())
+                res = backapp.run_command(user_id, project, data['command'].split(), False).stdout
                 if res is None:
                     res = ''.encode('utf-8')
                 await ws.send_json({'result': res.decode('utf-8')})
     except:
-        pass
+        sys.exc_info()
     await ws.close()
 
 @api.route('/api/loadproject')

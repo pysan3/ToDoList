@@ -12,6 +12,9 @@
     </div>
     <div class="inventory">
       <h2>{{ user_name }}-{{ project }}</h2>
+      <button @click="new_file.type='file'">make new file</button>
+      <button @click="new_file.type='dir'">make new dir</button>
+      <div v-if="new_file.type!=='none'"><input type="text" value="" v-model="new_file.name" @change="newFile"></div>
       <div v-for="(item, index) in comment" :key="index">
         <this-file :comment="item"/>
       </div>
@@ -28,8 +31,7 @@
       <textarea v-model="file_data[working_text[0]]" @change="working_text[1]+=1" name="file-data" id="file-data"></textarea>
     </div>
     <div class="terminal">
-      <input type="text" v-model="command[command.length-1]">
-      <button id="btn">send</button>
+      <input type="text" v-model="command[command.length-1]" id="send-command" @change="sendCommand">
       <h4>results</h4>
       <textarea readonly v-model="result_data" name="result-data" id="result-data"></textarea>
     </div>
@@ -49,6 +51,7 @@ export default {
     return {
       project: this.$route.params.project,
       comment: [],
+      new_file: {type: 'none', name: ''},
       user_name: '',
       working_text: ['', 0],
       autoSave: true,
@@ -91,7 +94,7 @@ export default {
           this.working_text = [to, 0];
         }).catch(error => {
           console.log(error);
-        })
+        });
       }
     },
     saveFile () {
@@ -99,41 +102,52 @@ export default {
         Axios.post(this.base_url + '/api/fileupload/' + this.working_text[0], {
           token: this.token,
           data: this.file_data[this.working_text[0]]
-        })
+        });
+      }
+    },
+    newFile () {
+      if (this.new_file.name.length !== 0) {
+        const command = {'file': 'echo "" >', 'dir': 'mkdir'};
+        this.connection.send(JSON.stringify({
+          token: this.token,
+          command: `${command[this.new_file.type]} ${this.new_file.name}`
+        }));
+        this.new_file.type = 'none';
+        this.new_file.name = '';
       }
     },
     ws_connection () {
       const vm = this;
-      vm.connection = new WebSocket(this.ws_url + '/ws/terminal');
-      vm.connection.onopen = () => {
+      this.connection = new WebSocket(this.ws_url + '/ws/terminal');
+      this.connection.onopen = () => {
         vm.connection.send(JSON.stringify({
           token: vm.token,
-          project: this.project
+          project: vm.project
         }));
       };
-      vm.connection.onmessage = event => {
+      this.connection.onmessage = event => {
         const data = JSON.parse(event.data);
         vm.result_data += data.result;
         vm.load_files();
       };
-      vm.connection.onclose = () => {
+      this.connection.onclose = () => {
         vm.connection.close();
         vm.connection = null;
         vm.autoSave = 'lost connection';
       }
-      const btn = document.getElementById('btn');
-      btn.onclick = () => {
-        let new_command = '!!', i = 1;
-        while (new_command === '!!') {
-          new_command = vm.command[vm.command.length-(i++)];
-        }
-        vm.connection.send(JSON.stringify({
-          token: vm.token,
-          command: new_command
-        }));
-        vm.result_data += `> ${new_command}\n`;
-        vm.command.push('');
-      };
+    },
+    sendCommand () {
+      const vm = this;
+      let new_command = '!!', i = 1;
+      while (new_command === '!!') {
+        new_command = vm.command[vm.command.length-(i++)];
+      }
+      this.connection.send(JSON.stringify({
+        token: vm.token,
+        command: new_command
+      }));
+      this.result_data += `> ${new_command}\n`;
+      this.command.push('');
     }
   },
   created () {
