@@ -1,6 +1,7 @@
 <template>
   <div>
     <p>Home page</p>
+    <h1>class for css, id for js</h1>
     <p>Random number from backend: {{ randomNumber }}</p>
     <button @click="getRandom">New random number</button>
     <router-link to="/about"><a>about</a></router-link>

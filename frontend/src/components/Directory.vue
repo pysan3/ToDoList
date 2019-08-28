@@ -1,15 +1,5 @@
 <template>
   <div class="directory">
-    <div class="header">
-      <div class="header-logo">auto make</div>
-      <div class="header-list">
-        <ul>
-          <li>プログラミングとは</li>
-          <li>学べるレッスン</li>
-          <li>お問い合わせ</li>
-        </ul>
-      </div>
-    </div>
     <div class="inventory">
       <h2>{{ user_name }}-{{ project }}</h2>
       <button @click="new_file.type='file'">make new file</button>
@@ -203,18 +193,6 @@ export default {
 
 li
   list-style none
-
-.header
-  background-color #26d0c9
-  color #fff
-  height 90px
-
-.header-logo
-  float left
-  font-size 36px
-
-.header-list li
-  float left
 
 .inventory
   width 200px

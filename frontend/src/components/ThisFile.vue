@@ -3,7 +3,7 @@
     <div @click="hidden">
       <img id="file-type" v-if="comment.type==='dir'" :src="images.folder" alt="folder" height="16px" width="16px">
       <img id="file-type" v-if="comment.type==='file'" :src="images.file" alt="file" height="16px" width="16px">
-      <p id="content-name">{{ comment.name }}</p>
+      <p id="comment-name">{{ comment.name }}</p>
     </div>
     <ul v-if="comment.show === '1'">
       <li class="inside" v-for="inside in comment.insides" :key="inside.id">
@@ -25,7 +25,7 @@ export default {
         folder: require('@/assets/folder.png'),
         file: require('@/assets/file.png')
       }
-    }
+    };
   },
   components: {
     ThisFile
@@ -57,7 +57,7 @@ export default {
     list-style none
     padding-left 16px
 
-p#content-name
+p#comment-name
   font-size medium
 
 img#file-type

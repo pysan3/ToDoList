@@ -65,7 +65,7 @@ async def ws_terminal(ws):
                     res = ''.encode('utf-8')
                 await ws.send_json({'result': res.decode('utf-8')})
     except:
-        sys.exc_info()
+        pass
     await ws.close()
 
 @api.route('/api/loadproject')
